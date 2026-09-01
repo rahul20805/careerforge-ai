@@ -98,3 +98,50 @@ async def generate_resume(
     await db.refresh(resume_version)
     
     return resume_version
+
+
+from fastapi.responses import FileResponse
+import os
+
+@router.get("/{id}/download/pdf")
+async def download_pdf(
+    id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    result = await db.execute(select(ResumeVersion).where(ResumeVersion.id == id, ResumeVersion.user_id == current_user.id))
+    resume = result.scalars().first()
+    
+    if not resume or not resume.pdf_file_path or not os.path.exists(resume.pdf_file_path):
+        raise HTTPException(status_code=404, detail="PDF not found")
+        
+    # Get first name from full name
+    first_name = current_user.full_name.split(' ')[0] if current_user.full_name else "User"
+        
+    return FileResponse(
+        path=resume.pdf_file_path, 
+        filename=f"CareerForge_Resume_{first_name}.pdf", 
+        media_type='application/pdf'
+    )
+
+@router.get("/{id}/download/docx")
+async def download_docx(
+    id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    result = await db.execute(select(ResumeVersion).where(ResumeVersion.id == id, ResumeVersion.user_id == current_user.id))
+    resume = result.scalars().first()
+    
+    if not resume or not resume.docx_file_path or not os.path.exists(resume.docx_file_path):
+        raise HTTPException(status_code=404, detail="DOCX not found")
+        
+    # Get first name from full name
+    first_name = current_user.full_name.split(' ')[0] if current_user.full_name else "User"
+        
+    return FileResponse(
+        path=resume.docx_file_path, 
+        filename=f"CareerForge_Resume_{first_name}.docx", 
+        media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+

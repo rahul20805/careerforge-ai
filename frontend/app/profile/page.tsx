@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface UserProfile {
-  first_name?: string;
-  last_name?: string;
-  skills?: string[];
+  headline?: string;
+  summary?: string;
+  phone?: string;
+  city?: string;
+  country?: string;
 }
 
 export default function Profile() {
@@ -26,16 +28,6 @@ export default function Profile() {
       
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
       try {
-        if (token === "mock_token_for_ui_exploration") {
-           setProfile({
-             first_name: "John",
-             last_name: "Doe",
-             skills: ["React", "TypeScript", "Next.js", "Python"]
-           });
-           setLoading(false);
-           return;
-        }
-
         const res = await fetch(`${apiUrl}/api/profile/`, {
           headers: {
             "Authorization": `Bearer ${token}`
@@ -63,19 +55,19 @@ export default function Profile() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
     
     try {
-      if (token !== "mock_token_for_ui_exploration") {
-        await fetch(`${apiUrl}/api/profile/`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(profile)
-        });
+      const res = await fetch(`${apiUrl}/api/profile/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(profile)
+      });
+      if (res.ok) {
+        alert("Profile Saved Successfully!");
       } else {
-        await new Promise(resolve => setTimeout(resolve, 800));
+        alert("Failed to save profile.");
       }
-      alert("Profile Saved Successfully!");
     } catch (err) {
       alert("Failed to save profile.");
     } finally {
@@ -118,33 +110,54 @@ export default function Profile() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">First Name</label>
+                <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Headline</label>
                 <input 
                   type="text" 
-                  value={profile?.first_name || ""}
-                  onChange={e => setProfile({...profile, first_name: e.target.value})}
+                  value={profile?.headline || ""}
+                  onChange={e => setProfile({...profile, headline: e.target.value})}
                   className="w-full px-5 py-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-zinc-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Last Name</label>
+                <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Phone</label>
                 <input 
                   type="text" 
-                  value={profile?.last_name || ""}
-                  onChange={e => setProfile({...profile, last_name: e.target.value})}
+                  value={profile?.phone || ""}
+                  onChange={e => setProfile({...profile, phone: e.target.value})}
+                  className="w-full px-5 py-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-zinc-400"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">City</label>
+                <input 
+                  type="text" 
+                  value={profile?.city || ""}
+                  onChange={e => setProfile({...profile, city: e.target.value})}
+                  className="w-full px-5 py-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-zinc-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Country</label>
+                <input 
+                  type="text" 
+                  value={profile?.country || ""}
+                  onChange={e => setProfile({...profile, country: e.target.value})}
                   className="w-full px-5 py-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-zinc-400"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Skills (Comma separated)</label>
+              <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Professional Summary</label>
               <textarea 
                 rows={4}
-                value={profile?.skills?.join(", ") || ""}
-                onChange={e => setProfile({...profile, skills: e.target.value.split(",").map(s => s.trimStart())})}
+                value={profile?.summary || ""}
+                onChange={e => setProfile({...profile, summary: e.target.value})}
                 className="w-full px-5 py-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-zinc-400"
-                placeholder="React, Python, SQL..."
+                placeholder="A brief overview of your professional background..."
               />
             </div>
 

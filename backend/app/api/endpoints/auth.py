@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from pydantic import BaseModel, EmailStr
 
-from app.db.session import get_db
-from app.db.models import User
+from app.database import get_db
+from app.models.entities import User
 from app.core.security import verify_password, get_password_hash, create_access_token
 
 router = APIRouter()
@@ -13,6 +13,7 @@ router = APIRouter()
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
+    full_name: str = "New User"
 
 class Token(BaseModel):
     access_token: str
@@ -28,7 +29,7 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     
     # Create new user
     hashed_password = get_password_hash(user.password)
-    new_user = User(email=user.email, hashed_password=hashed_password)
+    new_user = User(email=user.email, hashed_password=hashed_password, full_name=user.full_name)
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)

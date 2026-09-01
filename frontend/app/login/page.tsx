@@ -9,6 +9,7 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,15 +23,6 @@ export default function Login() {
     const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
 
     try {
-      // Mock successful login to allow UI exploration without backend DB
-      if (email && password) {
-        setTimeout(() => {
-           localStorage.setItem("token", "mock_token_for_ui_exploration");
-           router.push("/dashboard");
-        }, 800);
-        return;
-      }
-      
       let response;
       if (isLogin) {
         const formData = new URLSearchParams();
@@ -46,7 +38,7 @@ export default function Login() {
         response = await fetch(`${apiUrl}${endpoint}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, full_name: fullName }),
         });
       }
 
@@ -101,6 +93,19 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {!isLogin && (
+            <div>
+              <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Full Name</label>
+              <input 
+                type="text" 
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-zinc-400"
+                placeholder="John Doe"
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Email Address</label>
             <input 

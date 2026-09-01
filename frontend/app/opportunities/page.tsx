@@ -1,23 +1,54 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Opportunities() {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [parsed, setParsed] = useState(false);
+  const [parsedData, setParsedData] = useState<any>(null);
+  
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      router.push("/login");
+    }
+  }, [router]);
 
-  const handleParse = (e: React.FormEvent) => {
+  const handleParse = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setParsed(false);
+    setParsedData(null);
     
-    // Simulate AI parsing
-    setTimeout(() => {
-       setLoading(false);
-       setParsed(true);
-    }, 2500);
+    const token = localStorage.getItem("token");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    
+    try {
+      const res = await fetch(`${apiUrl}/api/opportunities/parse`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          url: url,
+          source_type: "URL"
+        })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setParsedData(data);
+      } else {
+        alert("Failed to parse opportunity.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error contacting backend.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,7 +72,7 @@ export default function Opportunities() {
         <header className="flex justify-between items-end border-b border-zinc-200/50 dark:border-zinc-800/50 pb-4">
           <div>
             <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-zinc-100 dark:to-zinc-500 bg-clip-text text-transparent">Discover Roles</h1>
-            <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-lg">Parse Job Descriptions instantly via URL to get AI matching scores.</p>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-lg">Parse Job Descriptions instantly via URL to get structured requirements.</p>
           </div>
         </header>
 
@@ -95,31 +126,31 @@ export default function Opportunities() {
         )}
 
         {/* Mock Results */}
-        {!loading && parsed && (
+        {!loading && parsedData && (
           <div className="p-8 rounded-3xl glass-card animate-fade-in-up border-l-4 border-l-primary">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-2xl font-bold tracking-tight">Parsed Opportunity</h3>
-                <p className="text-zinc-500 mt-1">This role matches your profile with an <strong className="text-primary">85% ATS fit</strong>.</p>
-              </div>
-              <div className="hidden sm:flex w-16 h-16 rounded-full bg-primary/10 text-primary items-center justify-center font-bold text-xl border-4 border-primary/20">
-                85%
+                <p className="text-zinc-500 mt-1">Successfully extracted structured details from the provided JD.</p>
               </div>
             </div>
             
             <div className="space-y-4">
               <div className="p-5 bg-white/50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 hover:border-primary/30 transition-colors">
                 <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Role</span>
-                <p className="font-semibold text-lg mt-1">Senior Frontend Engineer</p>
+                <p className="font-semibold text-lg mt-1">{parsedData.title} {parsedData.company_name ? `@ ${parsedData.company_name}` : ""}</p>
               </div>
               <div className="p-5 bg-white/50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 hover:border-primary/30 transition-colors">
-                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Required Skills</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Skills Extracted</span>
                 <div className="flex gap-2 mt-3 flex-wrap">
-                  {["React", "TypeScript", "Next.js", "GraphQL"].map(skill => (
-                    <span key={skill} className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-semibold shadow-sm border border-primary/20">
-                      {skill}
+                  {parsedData.requirements?.filter((req: any) => req.category === "skill").map((req: any) => (
+                    <span key={req.requirement_text} className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm font-semibold shadow-sm border border-primary/20">
+                      {req.requirement_text}
                     </span>
                   ))}
+                  {(!parsedData.requirements || parsedData.requirements.length === 0) && (
+                    <span className="text-zinc-500 text-sm">No specific skills detected.</span>
+                  )}
                 </div>
               </div>
             </div>
