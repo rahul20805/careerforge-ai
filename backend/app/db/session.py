@@ -2,7 +2,7 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite+aiosqlite:///./careerforge.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite+aiosqlite:////tmp/careerforge.db")
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = sessionmaker(
