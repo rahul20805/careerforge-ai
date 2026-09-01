@@ -148,3 +148,55 @@ class GeminiProvider(AIProvider):
     ) -> Dict[str, Any]:
         from app.ai.fallback_provider import FallbackProvider
         return await FallbackProvider().generate_email(master_profile, target_details, email_type, tone)
+
+    async def search_opportunities(self, query: str) -> List[Dict[str, Any]]:
+        """
+        Simulate searching for jobs/internships using Gemini to generate realistic, 
+        accurate-looking job listings based on the user's query.
+        """
+        if not self.model:
+            # Fallback to some generic mock data
+            return [
+                {
+                    "title": f"{query.title()} Role",
+                    "company_name": "Tech Corp",
+                    "location": "San Francisco, CA",
+                    "work_mode": "Hybrid",
+                    "opportunity_type": "Full-time",
+                    "application_url": "https://example.com/apply"
+                }
+            ]
+
+        prompt = f"""
+        Act as a job search engine. The user is searching for: "{query}".
+        Provide a list of 3-5 highly accurate, realistic, and specific job or internship opportunities that match this query.
+        Use real companies and realistic requirements.
+        
+        Return the result as a JSON array of objects with the following keys:
+        - title: string
+        - company_name: string
+        - location: string
+        - work_mode: string (Remote, Hybrid, Onsite)
+        - opportunity_type: string
+        - application_url: string (use a realistic looking careers page URL)
+        
+        Respond ONLY with the pure JSON array. No markdown, no extra text.
+        """
+        try:
+            response = self.model.generate_content(prompt)
+            text = response.text.strip()
+            if text.startswith("```"):
+                text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+            return json.loads(text)
+        except Exception as e:
+            print(f"Gemini search failed: {e}")
+            return [
+                {
+                    "title": f"{query.title()} Role",
+                    "company_name": "Tech Corp",
+                    "location": "San Francisco, CA",
+                    "work_mode": "Hybrid",
+                    "opportunity_type": "Full-time",
+                    "application_url": "https://example.com/apply"
+                }
+            ]

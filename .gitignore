@@ -62,3 +62,5 @@ uploads/
 generated_docs/
 backend/uploads/
 backend/generated_docs/
+
+.vercel

@@ -96,3 +96,16 @@ async def match_opportunity(
         
     profile = await get_current_profile(db, current_user)
     return MatchingEngine.calculate_match(profile, opportunity)
+
+@router.get("/search")
+async def search_opportunities(
+    query: str = Query(..., description="The job title or keywords to search for"),
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    """
+    Search for realistic job opportunities using Gemini based on the user's query.
+    """
+    from app.ai.gemini_provider import GeminiProvider
+    provider = GeminiProvider()
+    results = await provider.search_opportunities(query)
+    return results
