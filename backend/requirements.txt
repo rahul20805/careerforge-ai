@@ -20,3 +20,5 @@ openai
 pytest
 pytest-asyncio
 pytest-mock
+email-validator  
+ 

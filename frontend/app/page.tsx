@@ -2,79 +2,88 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-gradient-to-b from-background to-secondary">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          CareerForge AI
-        </p>
-      </div>
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 lg:p-24 bg-gradient-to-br from-background via-zinc-100 to-zinc-200 dark:from-background dark:via-zinc-900 dark:to-black relative overflow-hidden">
+      
+      {/* Animated Background Gradients */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-primary rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style={{ animationDelay: '4s' }}></div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <h1 className="text-5xl font-extrabold tracking-tight text-center drop-shadow-md">
-          Master Your Career Journey
+      <div className="z-10 w-full max-w-6xl flex flex-col items-center justify-center animate-fade-in-up">
+        
+        <div className="mb-12 inline-flex items-center px-4 py-1.5 rounded-full border border-primary/20 bg-primary/10 text-primary text-sm font-medium shadow-sm backdrop-blur-md">
+          <span className="relative flex h-2 w-2 mr-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          </span>
+          CareerForge AI is Live
+        </div>
+
+        <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight text-center text-zinc-900 dark:text-white max-w-4xl leading-tight drop-shadow-sm">
+          Master Your Career Journey with <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">AI Precision</span>
         </h1>
-      </div>
+        
+        <p className="mt-6 text-lg lg:text-xl text-center text-zinc-600 dark:text-zinc-400 max-w-2xl text-balance">
+          Automate your job search, generate truth-verified ATS resumes, and build your master profile using advanced AI technology.
+        </p>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <Link
-          href="/dashboard"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Dashboard{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            View your application pipeline and insights.
-          </p>
-        </Link>
+        <div className="mt-10 flex gap-4 mb-24">
+          <Link href="/login">
+            <button className="px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/30 transition-all hover:-translate-y-1">
+              Get Started for Free
+            </button>
+          </Link>
+          <Link href="/dashboard">
+            <button className="px-8 py-4 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm">
+              View Dashboard
+            </button>
+          </Link>
+        </div>
 
-        <Link
-          href="/opportunities"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Discover{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find tailored jobs and research internships.
-          </p>
-        </Link>
+        <div className="w-full grid gap-6 lg:grid-cols-4 lg:gap-8">
+          {[
+            {
+              title: "Smart Dashboard",
+              href: "/dashboard",
+              desc: "Track your application pipeline with dynamic AI insights.",
+              icon: "📊"
+            },
+            {
+              title: "Discover Roles",
+              href: "/opportunities",
+              desc: "Parse job descriptions instantly and match them against your profile.",
+              icon: "🔍"
+            },
+            {
+              title: "Verify Resumes",
+              href: "/resumes",
+              desc: "Generate ATS-beating resumes backed by your verified truth logic.",
+              icon: "📄"
+            },
+            {
+              title: "Master Profile",
+              href: "/profile",
+              desc: "Store your career history securely as a single source of truth.",
+              icon: "👤"
+            }
+          ].map((item, i) => (
+            <Link key={i} href={item.href} className="group glass-card p-6 rounded-2xl flex flex-col justify-between">
+              <div>
+                <div className="text-3xl mb-4 opacity-80 group-hover:opacity-100 transition-opacity">{item.icon}</div>
+                <h2 className="text-xl font-bold mb-2 text-zinc-800 dark:text-zinc-200 group-hover:text-primary transition-colors">
+                  {item.title}
+                </h2>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+              <div className="mt-6 flex items-center text-primary text-sm font-semibold opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
+                Explore <span className="ml-1">&rarr;</span>
+              </div>
+            </Link>
+          ))}
+        </div>
 
-        <Link
-          href="/resumes"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Resumes{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Generate verifiable, ATS-friendly resumes.
-          </p>
-        </Link>
-
-        <Link
-          href="/profile"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Profile{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50 text-balance">
-            Update your master profile to power AI generations.
-          </p>
-        </Link>
       </div>
     </main>
   );
