@@ -17,8 +17,8 @@ export default function Login() {
     setLoading(true);
     setError("");
 
-    // Use environment variable for API URL or default to Vercel/Localhost
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    // Use environment variable for API URL or default to empty string for relative paths in Vercel
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
     const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
 
     try {
