@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-gradient-to-b from-background to-secondary">
@@ -14,7 +16,7 @@ export default function Home() {
       </div>
 
       <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
+        <Link
           href="/dashboard"
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
         >
@@ -27,9 +29,9 @@ export default function Home() {
           <p className="m-0 max-w-[30ch] text-sm opacity-50">
             View your application pipeline and insights.
           </p>
-        </a>
+        </Link>
 
-        <a
+        <Link
           href="/opportunities"
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
         >
@@ -42,9 +44,9 @@ export default function Home() {
           <p className="m-0 max-w-[30ch] text-sm opacity-50">
             Find tailored jobs and research internships.
           </p>
-        </a>
+        </Link>
 
-        <a
+        <Link
           href="/resumes"
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
         >
@@ -57,9 +59,9 @@ export default function Home() {
           <p className="m-0 max-w-[30ch] text-sm opacity-50">
             Generate verifiable, ATS-friendly resumes.
           </p>
-        </a>
+        </Link>
 
-        <a
+        <Link
           href="/profile"
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
         >
@@ -72,7 +74,7 @@ export default function Home() {
           <p className="m-0 max-w-[30ch] text-sm opacity-50 text-balance">
             Update your master profile to power AI generations.
           </p>
-        </a>
+        </Link>
       </div>
     </main>
   );
