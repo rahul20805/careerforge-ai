@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     PROJECT_NAME: str = "CareerForge AI"
-    API_V1_STR: str = "/api/v1"
+    API_V1_STR: str = "/api"
     SECRET_KEY: str = "careerforge-production-super-secret-key-32-chars-min"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     
@@ -35,13 +35,13 @@ class Settings(BaseSettings):
             return ["*"]
 
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./careerforge.db"
-    SYNC_DATABASE_URL: str = "sqlite:///./careerforge.db"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:////tmp/careerforge.db" if os.getenv("VERCEL") else "sqlite+aiosqlite:///./careerforge.db")
+    SYNC_DATABASE_URL: str = os.getenv("SYNC_DATABASE_URL", "sqlite:////tmp/careerforge.db" if os.getenv("VERCEL") else "sqlite:///./careerforge.db")
 
     # Storage
     STORAGE_PROVIDER: str = "local"
-    STORAGE_DIR: str = "./uploads"
-    GENERATED_DOCS_DIR: str = "./generated_docs"
+    STORAGE_DIR: str = "/tmp/uploads" if os.getenv("VERCEL") else "./uploads"
+    GENERATED_DOCS_DIR: str = "/tmp/generated_docs" if os.getenv("VERCEL") else "./generated_docs"
 
     # AI Configuration
     AI_PROVIDER: str = "gemini"  # gemini, openai, fallback
