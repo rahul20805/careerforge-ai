@@ -1,92 +1,79 @@
-from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from sqlalchemy.future import select
+from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
 
-from app.database import get_db
-from app.models.entities import User, Profile, Education, Experience, Project, Skill
-from app.schemas.profile import (
-    ProfileResponse, ProfileUpdate, EducationCreate, EducationResponse,
-    ExperienceCreate, ExperienceResponse, ProjectCreate, ProjectResponse,
-    SkillCreate, SkillResponse
-)
-from app.security.auth import get_current_user
+from app.db.session import get_db
+from app.db.models import Profile, User
+from app.core.security import SECRET_KEY, ALGORITHM
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
 
 router = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
-async def get_current_profile(db: AsyncSession, current_user: User) -> Profile:
-    stmt = (
-        select(Profile)
-        .where(Profile.user_id == current_user.id)
-        .options(
-            selectinload(Profile.educations),
-            selectinload(Profile.experiences),
-            selectinload(Profile.projects),
-            selectinload(Profile.skills),
-            selectinload(Profile.certifications),
-            selectinload(Profile.publications),
-            selectinload(Profile.achievements),
-            selectinload(Profile.preferences),
-        )
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
     )
-    result = await db.execute(stmt)
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    
+    result = await db.execute(select(User).where(User.id == int(user_id)))
+    user = result.scalars().first()
+    if user is None:
+        raise credentials_exception
+    return user
+
+class ProfileUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    skills: Optional[List[str]] = None
+    experience: Optional[List[Dict[str, Any]]] = None
+    education: Optional[List[Dict[str, Any]]] = None
+
+@router.get("/")
+async def get_profile(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Profile).where(Profile.user_id == current_user.id))
     profile = result.scalars().first()
     if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-    return profile
-
-@router.get("/", response_model=ProfileResponse)
-async def read_profile(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-) -> Any:
-    return await get_current_profile(db, current_user)
-
-@router.put("/", response_model=ProfileResponse)
-async def update_profile(
-    *,
-    db: AsyncSession = Depends(get_db),
-    profile_in: ProfileUpdate,
-    current_user: User = Depends(get_current_user),
-) -> Any:
-    profile = await get_current_profile(db, current_user)
-    update_data = profile_in.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(profile, field, value)
+        return {"message": "Profile not found"}
     
-    await db.commit()
-    await db.refresh(profile)
-    return await get_current_profile(db, current_user)
+    return {
+        "first_name": profile.first_name,
+        "last_name": profile.last_name,
+        "skills": profile.skills,
+        "experience": profile.experience,
+        "education": profile.education,
+    }
 
-# Example sub-routes for projects
-@router.post("/projects", response_model=ProjectResponse)
-async def add_project(
-    *,
-    db: AsyncSession = Depends(get_db),
-    project_in: ProjectCreate,
-    current_user: User = Depends(get_current_user),
-) -> Any:
-    profile = await get_current_profile(db, current_user)
-    project = Project(**project_in.model_dump(), profile_id=profile.id)
-    db.add(project)
+@router.post("/")
+async def update_profile(profile_data: ProfileUpdate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Profile).where(Profile.user_id == current_user.id))
+    profile = result.scalars().first()
+    
+    if not profile:
+        profile = Profile(user_id=current_user.id)
+        db.add(profile)
+    
+    if profile_data.first_name is not None:
+        profile.first_name = profile_data.first_name
+    if profile_data.last_name is not None:
+        profile.last_name = profile_data.last_name
+    if profile_data.skills is not None:
+        profile.skills = profile_data.skills
+    if profile_data.experience is not None:
+        profile.experience = profile_data.experience
+    if profile_data.education is not None:
+        profile.education = profile_data.education
+        
     await db.commit()
-    await db.refresh(project)
-    return project
-
-@router.delete("/projects/{id}")
-async def delete_project(
-    *,
-    db: AsyncSession = Depends(get_db),
-    id: str,
-    current_user: User = Depends(get_current_user),
-) -> Any:
-    profile = await get_current_profile(db, current_user)
-    stmt = select(Project).where(Project.id == id, Project.profile_id == profile.id)
-    result = await db.execute(stmt)
-    project = result.scalars().first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
-    await db.delete(project)
-    await db.commit()
-    return {"success": True}
+    return {"status": "success", "message": "Profile updated"}
