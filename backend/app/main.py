@@ -30,6 +30,14 @@ if settings.CORS_ORIGINS:
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
+import os
+if os.getenv("VERCEL"):
+    from sqlalchemy import create_engine
+    from app.database import Base
+    import app.models.entities  # Ensure models are loaded
+    
+    sync_engine = create_engine(settings.SYNC_DATABASE_URL, connect_args={"check_same_thread": False})
+    Base.metadata.create_all(bind=sync_engine)
 @app.get("/health", tags=["health"])
 async def get_health():
     from app.integrations.hunter_client import HunterClient
