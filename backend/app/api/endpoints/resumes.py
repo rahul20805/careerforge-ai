@@ -7,10 +7,10 @@ import json
 from app.database import get_db
 from app.models.entities import User, Opportunity, ResumeVersion
 from app.schemas.resume import ResumeGenerateRequest, ResumeResponse
-from app.schemas.ats import ATSScoreRequest, ATSScoreResponse
+from app.schemas.ats import ATSScoreResponse
 from app.security.auth import get_current_user
 from app.api.endpoints.profile import get_current_profile
-from app.ai.router import ai_service
+from app.ai.gemini_provider import GeminiProvider
 from app.truth.engine import TruthEngine
 from app.ats.scorer import ATSScorer
 from app.documents.generator import DocumentGenerator
@@ -38,8 +38,7 @@ async def generate_resume(
                 "preferred_skills": [r.requirement_text for r in opportunity.requirements if r.category == "skill" and not r.is_mandatory]
             }
     elif request.target_job_description:
-        # Fallback to provided description
-        job_details = await ai_service.extract_job_details(request.target_job_description)
+        job_details = await GeminiProvider.extract_job_details(request.target_job_description)
         if request.target_job_title:
             job_details["title"] = request.target_job_title
     
@@ -64,7 +63,7 @@ async def generate_resume(
         "educations": [{"degree": e.degree, "institution": e.institution, "gpa": e.gpa} for e in profile.educations]
     }
     
-    tailored_content = await ai_service.tailor_resume_content(
+    tailored_content = await GeminiProvider.tailor_resume_content(
         master_profile=profile_dict,
         job_details=job_details,
         target_template=request.template_name

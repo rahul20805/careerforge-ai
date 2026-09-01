@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from app.ai.base import AIProvider
 from app.config import settings
 

@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 import fitz  # PyMuPDF
 from docx import Document as DocxDocument
 
-from app.ai.router import ai_service
+from app.ai.gemini_provider import GeminiProvider
 
 
 class JDParser:
@@ -16,7 +16,7 @@ class JDParser:
 
     @classmethod
     async def parse_text(cls, text: str) -> Dict[str, Any]:
-        return await ai_service.extract_job_details(text)
+        return await GeminiProvider.extract_job_details(text)
 
     @classmethod
     async def parse_url(cls, url: str) -> Dict[str, Any]:
@@ -36,7 +36,7 @@ class JDParser:
             lines = [line.strip() for line in clean_text.splitlines() if line.strip()]
             extracted_text = "\n".join(lines)
             
-            parsed = await ai_service.extract_job_details(extracted_text)
+            parsed = await GeminiProvider.extract_job_details(extracted_text)
             parsed["source_url"] = url
             parsed["official_url"] = url
             return parsed
@@ -48,11 +48,11 @@ class JDParser:
         for page in doc:
             text_parts.append(page.get_text())
         extracted_text = "\n".join(text_parts)
-        return await ai_service.extract_job_details(extracted_text)
+        return await GeminiProvider.extract_job_details(extracted_text)
 
     @classmethod
     async def parse_docx(cls, file_path: str) -> Dict[str, Any]:
         doc = DocxDocument(file_path)
         text_parts = [p.text for p in doc.paragraphs if p.text.strip()]
         extracted_text = "\n".join(text_parts)
-        return await ai_service.extract_job_details(extracted_text)
+        return await GeminiProvider.extract_job_details(extracted_text)
