@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: careerforge-api
+    env: python
+    region: ohio
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        value: sqlite:///./careerforge.db
+      - key: AI_PROVIDER
+        value: fallback
